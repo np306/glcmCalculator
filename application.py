@@ -17,12 +17,12 @@ resultantGlcmMatrix = resultvalue[:, :, 0, 0][1:, 1:]
 print(resultantGlcmMatrix)
 
 
-@application.route('/glcmCalculator')
+@application.route('/')
 def render_html():  # put application's code here
     return render_template('glcmView.html', Matrix1=randomImageMatrix, GlcmMatrix=resultantGlcmMatrix, Distance=1, Angle=0)
 
 
-@application.route('/glcmCalculator', methods=['POST'])
+@application.route('/', methods=['POST'])
 def calculate_glcm():
     distance = int(request.form['distance'])
     angle = request.form['angle']
