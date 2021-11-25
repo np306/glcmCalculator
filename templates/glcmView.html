@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+    <script type = "text/javascript"
+         src = "{{ url_for('static', filename = 'script.js') }}" ></script>
+    <title>GLCM Calaculator</title>
+</head>
+<body style="background-color: lightgrey">
+<div style="padding-top: 35px">
+<div class="container" style="padding-top: 35px">
+<!-- GLCM Calculator Form-->
+    <div class="card" style="background-color: #6c757d">
+        <h5 class="card-header" style="color: lightgrey">GLCM Calculator</h5>
+        <div class="card-body">
+            <div class="container-md">
+                <form action="/glcmCalculator" method="POST">
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="distance">Distance</label>
+                            </div>
+                            <select class="form-select" name="distance" id="distance">
+                                <option selected>Choose...</option>
+                                <option value=1>1</option>
+                                <option value=2>2</option>
+                                <option value=3>3</option>
+                                <option value=4>4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="angle">Angle</label>
+                            </div>
+                            <select class="form-select"  name="angle"
+                                    id="angle">
+                                <option>Choose...</option>
+                                <option value=0>0</option>
+                                <option value=45>45</option>
+                                <option value=90>90</option>
+                                <option value=135>135</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-primary">Calculate</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Result Content-->
+    <div class="tabcontent" style="background-color: white">
+        <p><i><strong>Distance: {{ Distance }}</strong></i></p>
+        <p><i><strong>Angle: {{ Angle }}</strong></i></p>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                 <!-- Random Matrix-->
+                    <table class="table table-sm table-bordered caption-top" id="randomMatTable">
+                        <caption>Image Matrix:</caption>
+                        <tr class="thead" style="background-color:grey">
+                            <td>#</td>
+                            {%- for index in range(1 ,Matrix1[0].size + 1) %}
+                                <th scope="col">{{ index }}</th>
+                            {%- endfor %}
+                        </tr>
+                        {% for row in Matrix1 %}
+                            <tr>
+                                <th style="background-color:grey" scope="row">{{ loop.index }}</th>
+                                {% for cell in row %}
+                                    <td>{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            <!-- GLCM Matrix-->
+                <div class="col">
+                    <table class="table table-sm table-bordered caption-top" id="glcmTable">
+                        <caption>GlcmMatrix slots:</caption>
+                        <tr class="thead" style="background-color:grey">
+                            <td>#</td>
+                            {%- for index in range(0 ,GlcmMatrix[0].size) %}
+                                <th scope="col">{{ index + 1 }}</th>
+                            {%- endfor %}
+                        </tr>
+                        {% for row in GlcmMatrix %}
+                            <tr>
+                                <th style="background-color:grey" scope="row">{{ loop.index }}</th>
+                                {% for cell in row %}
+                                    <td>{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</body>
+<script>
+
+    // Get all elements with class="tabcontent" and hide them
+
+    const tbody = document.querySelector('#glcmTable tbody');
+    tbody.addEventListener('click', function (e) {
+        const cell = e.target.closest('td');
+        if (!cell) {
+            return;
+        } // Quit, not clicked on a cell
+        const row = cell.parentElement;
+    });
+
+    var table = document.getElementById('glcmTable');
+    var cells = table.getElementsByTagName('td');
+    for (var i = 0; i < cells.length; i++) {
+        var cell = cells[i];
+        cell.onclick = function (e) {
+            var o = Math.round, r = Math.random, s = 255;
+            var color = 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')'
+            highlightNumber(this, color);
+        }
+    }
+
+    function highlightNumber(element, randomColor) {
+        var angle ={{ Angle }}
+
+        if (angle === 45) {
+            angle45(angle, {{ Distance }}, element, randomColor)
+        }
+        if (angle === 0) {
+            angleZero(angle, {{ Distance }}, element, randomColor)
+        }
+        if (angle === 135) {
+            angle135(angle, {{ Distance }}, element, randomColor)
+        }
+        if (angle === 90) {
+            angle90(angle, {{ Distance }}, element, randomColor)
+        }
+
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</html>
